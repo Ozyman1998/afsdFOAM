@@ -1,0 +1,4 @@
+solid/solidRegionDiffNo.C
+afsd.C
+
+EXE = $(FOAM_USER_APPBIN)/afsdFoam

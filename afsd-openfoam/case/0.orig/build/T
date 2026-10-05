@@ -1,0 +1,63 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  v2412                                 |
+|   \\  /    A nd           |                                                 |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       volScalarField;
+    location    "0/build";
+    object      T;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+dimensions      [0 0 0 1 0 0 0];
+
+internalField   uniform 300;
+
+boundaryField
+{
+    "build_(top|sides|front|back)"
+    {
+        type            inletOutlet;
+        inletValue      uniform 300;
+        value           uniform 300;
+    }
+
+    // Interfaz con el sustrato: continuidad de T y flujo (tesis ec. 18).
+    // kappa del fluido: campo "kappa" que calcula el solver.
+    "build_to_.*"
+    {
+        type            compressible::turbulentTemperatureCoupledBaffleMixed;
+        Tnbr            T;
+        kappaMethod     lookup;
+        kappa           kappa;
+        value           uniform 300;
+    }
+
+    // Calor de fricción de la herramienta (ec. 15-17).
+    // El gradiente lo fija el solver en cada iteración.
+    "tool(Face|Side)"
+    {
+        type            fixedGradient;
+        gradient        uniform 0;
+        value           uniform 300;
+    }
+
+    // Conducción 1D por la barra (ec. 14). refValue/valueFraction los fija
+    // el solver.
+    inlet
+    {
+        type            mixed;
+        refValue        uniform 300;
+        refGradient     uniform 0;
+        valueFraction   uniform 1;
+        value           uniform 300;
+    }
+}
+
+// ************************************************************************* //

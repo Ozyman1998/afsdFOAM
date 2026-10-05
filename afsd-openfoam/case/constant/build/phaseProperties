@@ -1,0 +1,69 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  v2412                                 |
+|   \\  /    A nd           |                                                 |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "constant/build";
+    object      phaseProperties;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+// Fases de la región build (Kincaid 2022, cap. 2).
+// Mezcla por media ponderada en volumen (ec. 2).
+
+metal   // AA6061-T6
+{
+    rho         2700;       // [kg/m3]  supuesto (la tesis no lo da)
+    Cp          896;        // [J/kg/K] supuesto (la tesis no lo da)
+
+    // constant (usa mu) | SellarsTegart (ec. 6-9)
+    viscosityModel  SellarsTegart;
+    mu              1e4;    // [Pa s] sólo si viscosityModel constant
+
+    SellarsTegartCoeffs
+    {
+        // Tabla 2.1
+        sigmaN      2.22e7;     // [Pa]
+        A           2.41e8;     // [1/s]
+        n           3.55;       // [-]
+        Q           1.45e5;     // [J/mol]
+        R           8.314;      // [J/mol/K]
+
+        // Límites numéricos (NO están en la tesis)
+        epsDotMin   1e-3;       // [1/s]  evita mu -> infinito en reposo
+        muMax       1e7;        // [Pa s] tope de viscosidad
+        Tmin        293;        // [K]    T mínima para evaluar la ley
+        Tmax        855;        // [K]    solidus AA6061 (582 °C)
+    }
+
+    // k = k0 + k1 T + k2 T^2 + k3 T^3, T en °C (ec. 11)
+    kappaCoeffs (167 0.084 -4.14e-4 3.13e-7);
+}
+
+air
+{
+    rho         1.2;        // [kg/m3]
+    Cp          1005;       // [J/kg/K]
+
+    // Viscosidad artificial nu = 1 m2/s (tesis 2.3.1): mu = rho*nu
+    mu          1.2;        // [Pa s]
+
+    kappaCoeffs (0.0262 0 0 0);
+}
+
+// Coeficiente de Taylor-Quinney (ec. 10)
+betaTQ          0.5;
+
+// Rango de validez del ajuste k(T) [°C]
+kappaTmin       0;
+kappaTmax       600;
+
+
+// ************************************************************************* //

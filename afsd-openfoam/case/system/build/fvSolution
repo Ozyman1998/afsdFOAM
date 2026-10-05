@@ -1,0 +1,88 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  v2412                                 |
+|   \\  /    A nd           |                                                 |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "system/build";
+    object      fvSolution;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+solvers
+{
+    "alpha.metal.*"
+    {
+        nAlphaCorr      2;
+        cAlpha          1;
+    }
+
+    p
+    {
+        solver          GAMG;
+        smoother        DIC;
+        tolerance       1e-8;
+        relTol          0.01;
+    }
+
+    pFinal
+    {
+        $p;
+        relTol          0;
+    }
+
+    "(U|T)"
+    {
+        solver          PBiCGStab;
+        preconditioner  DILU;
+        tolerance       1e-9;
+        relTol          0.01;
+    }
+
+    "(U|T)Final"
+    {
+        solver          PBiCGStab;
+        preconditioner  DILU;
+        tolerance       1e-9;
+        relTol          0;
+    }
+}
+
+PIMPLE
+{
+    // Bucle externo: termina cuando el residuo inicial de p < outerCorrectorResidual
+    nOuterCorrectors        10;
+    nCorrectors             2;
+    nNonOrthogonalCorrectors 0;
+    momentumPredictor       yes;
+    outerCorrectorResidual  1e-3;
+
+    // Término transpuesto del esfuerzo viscoso: off | mixture | metal
+    // (mixture es inestable en la interfaz metal/aire)
+    transposeStress         metal;
+}
+
+// Con nu_aire = 1 m2/s, el bucle externo necesita subrelajación también en
+// la iteración final (sin ella diverge)
+relaxationFactors
+{
+    fields
+    {
+        p               0.3;
+        pFinal          0.3;
+    }
+    equations
+    {
+        U               0.7;
+        UFinal          0.7;
+        ".*"            1;
+    }
+}
+
+// ************************************************************************* //

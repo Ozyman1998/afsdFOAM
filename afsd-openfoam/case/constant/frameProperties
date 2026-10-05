@@ -1,0 +1,23 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  v2412                                 |
+|   \\  /    A nd           |                                                 |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "constant";
+    object      frameProperties;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+// Velocidad de avance de la herramienta (Tabla 2.2: 2.12 mm/s, en +x).
+// Todo el dominio se resuelve en el marco de la herramienta:
+// sustrato y yunque se trasladan a -Vt.
+Vt              (0.00212 0 0);    // [m/s]
+
+// ************************************************************************* //

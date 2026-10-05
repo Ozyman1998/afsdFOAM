@@ -1,0 +1,58 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  v2412                                 |
+|   \\  /    A nd           |                                                 |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       volScalarField;
+    location    "0/anvil";
+    object      T;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+dimensions      [0 0 0 1 0 0 0];
+
+internalField   uniform 300;
+
+boundaryField
+{
+    // Laterales y fondo: convección h = 10 W/m2K (tesis, cap. 2)
+    ".*"
+    {
+        type            externalWallHeatFluxTemperature;
+        mode            coefficient;
+        h               uniform 10;
+        Ta              constant 300;
+        kappaMethod     solidThermo;
+        value           $internalField;
+    }
+
+    // Marco de la herramienta: el sólido entra por x = +L/2 a temperatura
+    // ambiente y sale por x = -L/2
+    anvil_front
+    {
+        type            fixedValue;
+        value           uniform 300;
+    }
+
+    anvil_back
+    {
+        type            zeroGradient;
+    }
+
+    // Interfaces: continuidad de T y de flujo de calor
+    "anvil_to_.*"
+    {
+        type            compressible::turbulentTemperatureCoupledBaffleMixed;
+        Tnbr            T;
+        kappaMethod     solidThermo;
+        value           $internalField;
+    }
+}
+
+// ************************************************************************* //

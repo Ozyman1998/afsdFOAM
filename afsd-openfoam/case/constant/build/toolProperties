@@ -1,0 +1,43 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  v2412                                 |
+|   \\  /    A nd           |                                                 |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "constant/build";
+    object      toolProperties;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+// Herramienta y barra (Kincaid 2022, cap. 2, ec. 12-17; Tabla 2.2).
+// Eje de giro: eje z por el origen. Avance Vt: constant/frameProperties.
+
+toolPatches     (toolFace toolSide);
+inletPatch      inlet;
+substratePatches (build_to_substrate);  // U = -Vt (lo fija el solver)
+
+// --- Cinemática
+omega           31.4159265;     // [rad/s] 300 rpm (Tabla 2.2)
+delta           0.25;           // [-] fracción de deslizamiento (cap. 2)
+feedVelocity    0.00212;        // [m/s] V_i, caso óptimo (Tabla 2.2)
+
+// --- Calor de fricción (ec. 15-17)
+muF0            0.4;            // [-]   mu_f = muF0 exp(-lambda delta omega r)
+lambda          1;              // [s/m] (Nandan; cap. 3)
+tauStrainRate   0.1;            // [1/s] tau = sigma_f(T, 0.1 1/s) (cap. 2)
+heatFraction    0.696;          // [-]   J_B/(J_B+J_T) (cap. 5)
+
+// --- Conducción 1D por la barra (ec. 14)
+// SUPUESTO: la tesis no da L. L = alpha_Al/V_i = 6.9e-5/2.12e-3 = 0.0325 m,
+// longitud de penetración térmica de una barra que avanza a V_i.
+rodLength       0.0325;         // [m]
+rodTa           300;            // [K]
+
+
+// ************************************************************************* //
