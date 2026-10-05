@@ -1,0 +1,28 @@
+# Compilación de OpenFOAM
+solver/Make/linux64*
+solver/lnInclude
+solver/log.*
+
+# Resultados y ficheros generados en el caso
+case/[0-9]*/
+!case/0.orig/
+case/0/
+case/processor*/
+case/postProcessing/
+case/constant/polyMesh/
+case/constant/*/polyMesh/
+case/log.*
+case/*.foam
+case/termopares_*.csv
+case/termopares.png
+case/system/thermocouples
+
+# Geometría y malla generadas
+case/geometry/*.msh
+case/geometry/*.brep
+case/geometry/*.step
+case/geometry/log.*
+
+# Python
+__pycache__/
+*.pyc
